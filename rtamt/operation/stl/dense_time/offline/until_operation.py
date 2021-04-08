@@ -1,7 +1,7 @@
 from rtamt.operation.abstract_operation import AbstractOperation
 import rtamt.operation.stl.dense_time.offline.intersection as intersect
 
-class SinceOperation(AbstractOperation):
+class UntilOperation(AbstractOperation):
     def __init__(self):
         pass
 
@@ -14,14 +14,16 @@ class SinceOperation(AbstractOperation):
             iout.append(last)
 
         out = []
-        prev = -float("inf")
-        for i, sample in enumerate(iout):
+        next = -float("inf")
+        for i, sample in reversed(list(enumerate(iout))):
             t = sample[0]
             o1_val = sample[1][0]
             o2_val = sample[1][1]
-            result = max(min(o1_val, o2_val), min(o1_val, prev))
-            if result != prev or i == len(iout) - 1:
-                out.append([t, result])
-            prev = result
+            result = max(min(o1_val, o2_val), min(o1_val, next))
+            if result == next and i < len(iout) - 2:
+                out.pop(0)
+            out.insert(0, [t, result])
+            next = result
 
         return out
+
